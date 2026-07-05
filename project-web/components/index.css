@@ -1,0 +1,226 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,850;1,850&display=swap");
+@import "tailwindcss";
+@import "tw-animate-css";
+:root {
+  --app-font: "Nunito", sans-serif;
+  --app-font-serif: Georgia, serif;
+  --app-font-mono: Menlo, monospace;
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(220, 10%, 15%);
+  --primary: hsl(212, 100%, 50%);
+  --secondary: hsl(220, 15%, 10%);
+  --success: hsl(220, 15%, 10%);
+  --error: hsl(0, 84%, 52%);
+  --warning: hsl(39, 100%, 50%);
+  --muted: hsl(220, 10%, 95%);
+  --muted-foreground: hsl(220, 10%, 45%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --radius: 0.5rem;
+
+  /* Additional theme variables */
+  --font-size-base: 18px;
+  --font-size-lg: 20px;
+  --font-size-xl: 24px;
+  --font-size-2xl: 30px;
+  --font-size-3xl: 36px;
+  --color-border: hsl(220, 10%, 85%);
+  --color-input: hsl(220, 10%, 98%);
+  --color-popover: hsl(0, 0%, 100%);
+  --color-white: hsl(0, 0%, 100%);
+  --color-muted-border: hsl(220, 10%, 85%);
+  --sidebar-border: hsl(220, 10%, 85%);
+  --sidebar-primary-border: hsl(212, 100%, 42%);
+}
+
+.dark {
+  --app-font: "Nunito", sans-serif;
+  --app-font-serif: Georgia, serif;
+  --app-font-mono: Menlo, monospace;
+  --background: hsl(220, 15%, 10%);
+  --foreground: hsl(0, 0%, 95%);
+  --primary: hsl(212, 100%, 55%);
+  --secondary: hsl(220, 15%, 10%);
+  --success: hsl(220, 15%, 10%);
+  --error: hsl(0, 84%, 52%);
+  --warning: hsl(39, 100%, 50%);
+  --muted: hsl(220, 15%, 22%);
+  --muted-foreground: hsl(220, 10%, 60%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --radius: 0.5rem;
+
+  /* Additional theme variables */
+  --font-size-base: 18px;
+  --font-size-lg: 20px;
+  --font-size-xl: 24px;
+  --font-size-2xl: 30px;
+  --font-size-3xl: 36px;
+  --color-border: hsl(220, 15%, 25%);
+  --color-input: hsl(220, 15%, 18%);
+  --color-popover: hsl(220, 15%, 12%);
+  --color-white: hsl(0, 0%, 100%);
+  --color-muted-border: hsl(220, 15%, 25%);
+  --sidebar-border: hsl(220, 15%, 20%);
+  --sidebar-primary-border: hsl(220, 15%, 30%);
+}
+@theme {
+  --font-size-base: var(--font-size-base);
+  --font-size-lg: var(--font-size-lg);
+  --font-size-xl: var(--font-size-xl);
+  --font-size-2xl: var(--font-size-2xl);
+  --font-size-3xl: var(--font-size-3xl);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-border: var(--color-border);
+  --color-input: var(--color-input);
+  --color-ring: var(--primary);
+  --color-pastel-blue: var(--muted);
+  --color-popover: var(--color-popover);
+  --color-popover-foreground: var(--foreground);
+  --color-popover-border: var(--color-border);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-border: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--color-white);
+  --color-secondary-border: var(--secondary);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted-border: var(--color-muted-border);
+  --color-destructive: var(--error);
+  --color-destructive-foreground: var(--color-white);
+  --color-destructive-border: var(--error);
+  --color-chart-1: var(--primary);
+  --color-chart-2: var(--secondary);
+  --color-chart-3: var(--secondary);
+  --color-chart-4: var(--success);
+  --color-chart-5: var(--error);
+  --color-sidebar: var(--primary);
+  --color-sidebar-foreground: var(--color-white);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-primary: var(--primary);
+  --color-sidebar-primary-foreground: var(--color-white);
+  --color-sidebar-primary-border: var(--sidebar-primary-border);
+  --color-sidebar-accent: var(--muted);
+  --color-sidebar-accent-foreground: var(--primary);
+  --color-sidebar-accent-border: var(--color-muted-border);
+  --color-sidebar-ring: var(--primary);
+  --font-family-sans: var(--app-font);
+  --font-family-serif: var(--app-font-serif);
+  --font-family-mono: var(--app-font-mono);
+  --font-family-heading: var(--app-font);
+  --border-radius-sm: calc(var(--radius) - 4px);
+  --border-radius-md: calc(var(--radius) - 2px);
+  --border-radius-lg: var(--radius);
+  --border-radius-xl: calc(var(--radius) + 4px);
+}
+html {
+  font-size: var(--font-size-base);
+}
+body {
+  font-family: var(--app-font);
+  font-optical-sizing: auto;
+  font-weight: 850;
+  font-style: normal;
+  @apply bg-background text-foreground;
+}
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(220, 10%, 75%);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(220, 10%, 65%);
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: hsl(220, 15%, 35%);
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: hsl(220, 15%, 45%);
+}
+.leaflet-control-zoom,
+.leaflet-control-attribution {
+  display: none !important;
+}
+[data-radix-popper-content-wrapper] {
+  position: fixed !important;
+  z-index: 9999 !important;
+}
+[data-radix-portal] {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  pointer-events: none !important;
+}
+[data-radix-portal] > * {
+  pointer-events: auto !important;
+}
+body[data-radix-dropdown-menu-open] {
+  overflow: hidden !important;
+}
+
+/* Primary button 3D press effect */
+.btn-primary {
+  @apply relative box-border overflow-visible text-center uppercase align-middle outline-none select-none touch-manipulation;
+  appearance: button;
+  border: solid transparent;
+  border-radius: 16px;
+  border-width: 0 0 4px;
+  letter-spacing: 0.8px;
+  line-height: 20px;
+  padding: 13px 19px;
+  transform: translateZ(0);
+  transition: filter 0.2s;
+}
+
+.btn-primary::after {
+  @apply absolute inset-0 rounded-2xl border-solid border-transparent;
+  background-clip: padding-box;
+  background-color: color-mix(in srgb, var(--primary) 70%, transparent);
+  border-width: 0 0 4px;
+  bottom: -4px;
+  content: "";
+  z-index: -1;
+}
+
+.btn-primary:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.btn-primary:active::after {
+  border-width: 0;
+}
+
+.btn-primary:active {
+  @apply pb-[10px];
+}
+
+/* MUI-style ripple animation */
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+.animate-ripple {
+  animation: ripple 600ms ease-out forwards;
+}
+
+/* iOS video scaling fixes */
+.ios-video-fix {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}

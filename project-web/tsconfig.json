@@ -1,0 +1,49 @@
+{
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "alwaysStrict": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "lib": ["es2022", "dom", "dom.iterable"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "paths": {
+      "@/*": ["./src/*"],
+      "@admin/*": ["./admin/*"],
+      "@components/*": ["./components/*"],
+      "@utils/*": ["./utils/*"]
+    },
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "strictBindCallApply": true,
+    "strictFunctionTypes": false,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+    "target": "es2022",
+    "types": ["node", "vite/client", "google.maps"]
+  },
+  "exclude": ["build", "dist-admin", "dist-web", "dist", "node_modules"],
+  "files": ["./tsconfig.node.json"],
+  "include": [
+    "src/**/*",
+    "components/**/*",
+    "web/**/*",
+    "admin/**/*",
+    "utils/**/*"
+  ],
+  "ts-node": {
+    "compilerOptions": {
+      "allowImportingTsExtensions": false,
+      "esModuleInterop": true,
+      "module": "commonjs",
+      "moduleResolution": "node"
+    },
+    "transpileOnly": true
+  }
+}

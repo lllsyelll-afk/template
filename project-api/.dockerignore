@@ -1,0 +1,11 @@
+node_modules
+package-lock.json
+dist
+dist-api
+dist-web
+dist-admin
+.env
+*.log
+.git
+.vscode
+*.tsbuildinfo

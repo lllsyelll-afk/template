@@ -1,0 +1,50 @@
+{
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1064.0",
+    "@aws-sdk/s3-request-presigner": "^3.1064.0",
+    "@chargily/chargily-pay": "^2.1.0",
+    "@hono/node-server": "^1.19.12",
+    "@supabase/supabase-js": "^2.43.4",
+    "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.10.0",
+    "dotenv": "^16.3.1",
+    "firebase": "^10.14.1",
+    "googleapis": "^173.0.0",
+    "hono": "^4.12.10",
+    "@inquirer/prompts": "^7.5.0",
+    "hono-rate-limiter": "^0.5.3",
+    "jsonwebtoken": "^9.0.3",
+    "mongodb": "^6.5.0",
+    "otplib": "^13.4.1",
+    "serve": "^14.2.6",
+    "sharp": "^0.35.2",
+    "twilio": "^6.0.2",
+    "web-push": "^3.6.7",
+    "ws": "^8.18.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^25.5.2",
+    "@types/web-push": "^3.6.4",
+    "@types/ws": "^8.5.12",
+    "nodemon": "^3.1.14",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
+  },
+  "name": "@project/api",
+  "scripts": {
+    "build.api": "tsc --project tsconfig.json",
+    "build.cli": "tsc --project tsconfig.cli.json",
+    "dev.api": "bun --watch ./src/index.ts",
+    "dev.cli": "bun --watch ./scripts/cli.ts",
+    "run.api": "bun ./dist/index.js",
+    "run.cli": "bun ./dist-scripts/cli.js",
+    "generate-vapid": "web-push generate-vapid-keys",
+    "lint": "eslint .",
+    "lint.fix": "eslint . --fix",
+    "check": "tsc --noEmit"
+  },
+  "version": "0.0.1"
+}

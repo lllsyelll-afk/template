@@ -1,0 +1,42 @@
+node_modules
+
+# Environment variables
+.env
+
+# Build output
+dist/
+dist-scripts/
+build/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Cache & temp
+.eslintcache
+.npm
+.temp/
+.tmp/
+coverage/
+
+# User uploads
+uploads/
+
+node_modules/
+bun.lock
+
+package-lock.json
