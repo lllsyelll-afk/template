@@ -100,6 +100,7 @@ export default defineConfig(({ mode, command }) => {
         "@components": path.resolve(__dirname, "./components"),
         "@admin": path.resolve(__dirname, "./admin"),
         "@utils": path.resolve(__dirname, "./utils"),
+        "app-types": path.resolve(__dirname, "../project-types/src/index.ts"),
       },
       dedupe: ["react", "react-dom"],
     },

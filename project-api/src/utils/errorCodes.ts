@@ -12,6 +12,10 @@ export const ErrorCode = {
   GOOGLE_AUTH_FAILED: "auth_google_failed",
   GOOGLE_ACCOUNT_NOT_FOUND: "auth_google_account_not_found",
   INVALID_GOOGLE_TOKEN: "auth_invalid_google_token",
+  FACEBOOK_AUTH_NOT_CONFIGURED: "auth_facebook_not_configured",
+  FACEBOOK_AUTH_FAILED: "auth_facebook_failed",
+  FACEBOOK_ACCOUNT_NOT_FOUND: "auth_facebook_account_not_found",
+  INVALID_FACEBOOK_TOKEN: "auth_invalid_facebook_token",
   EMAIL_NOT_VERIFIED: "auth_email_not_verified",
   REQUEST_FAILED: "auth_request_failed",
   TOTP_REQUIRED: "auth_totp_required",
@@ -67,10 +71,6 @@ export const ErrorCode = {
   FILE_TYPE_NOT_ALLOWED: "file_type_not_allowed",
   INVALID_FOLDER: "file_invalid_folder",
   UPLOAD_FAILED: "file_upload_failed",
-
-  // Google Calendar
-  FAILED_TO_GENERATE_AUTH_URL: "calendar_auth_url_failed",
-  DISCONNECT_FAILED: "calendar_disconnect_failed",
 
   // Push
   PUSH_NOT_CONFIGURED: "push_not_configured",

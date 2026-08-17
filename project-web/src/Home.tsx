@@ -32,7 +32,7 @@ export function Home() {
         </p>
         <div className="flex flex-wrap justify-center gap-4">
           {isAuthenticated ? (
-            <Link to="/map">
+            <Link to="/">
               <Button>{t("home_get_started")}</Button>
             </Link>
           ) : (

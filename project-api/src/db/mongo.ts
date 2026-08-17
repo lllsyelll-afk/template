@@ -186,6 +186,9 @@ export async function createMongoRepositories(
       async findByGoogleId(googleId) {
         return mapUser(await usersCol.findOne({ googleId }));
       },
+      async findByFacebookId(facebookId) {
+        return mapUser(await usersCol.findOne({ facebookId }));
+      },
       async findAll() {
         const docs = await usersCol.find({}).sort({ createdAt: -1 }).toArray();
         return docs.map((d) => mapUser(d)!);

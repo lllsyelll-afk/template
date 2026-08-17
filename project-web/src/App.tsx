@@ -28,6 +28,7 @@ import {
 } from "@utils/devConfig";
 import AuthPage from "@/pages/Auth";
 import VerifyOtpPage from "@/pages/VerifyOtp";
+import Dashboard from "@/pages/Dashboard";
 import { SplashScreen } from "@/components/SplashScreen";
 
 const queryClient = new QueryClient({
@@ -59,9 +60,14 @@ function Router() {
         </RequireGuest>
       </Route>
       <Route path="/verify-otp" component={VerifyOtpPage} />
+      <Route path="/">
+        <RequireAuth>
+          <Dashboard />
+        </RequireAuth>
+      </Route>
       <Route path="*">
         <RequireAuth>
-          <div className="min-h-screen bg-background"></div>
+          <Dashboard />
         </RequireAuth>
       </Route>
     </Switch>

@@ -35,6 +35,7 @@ const registerSchema = z
     password: z.string().min(8).max(128),
     photo: z.string().url().optional(),
     googleId: z.string().min(1).optional(),
+    facebookId: z.string().min(1).optional(),
   })
   .refine(
     (data) => {
@@ -82,6 +83,10 @@ const resetPasswordSchema = z
 
 const googleLoginSchema = z.object({
   credential: z.string().min(1),
+});
+
+const facebookLoginSchema = z.object({
+  accessToken: z.string().min(1),
 });
 
 
@@ -144,6 +149,53 @@ async function verifyGoogleCredential(
   }
 }
 
+type FacebookVerifyError = {
+  error: "invalid_facebook_token" | "email_not_verified";
+  status: 401;
+};
+
+async function verifyFacebookAccessToken(
+  accessToken: string,
+): Promise<
+  | FacebookVerifyError
+  | {
+      facebookId: string;
+      email?: string;
+      name?: string;
+      picture?: string;
+    }
+> {
+  const facebookAppId = process.env.FACEBOOK_APP_ID;
+  if (!facebookAppId) {
+    throw new Error("Facebook App ID not configured");
+  }
+
+  try {
+    const url = `https://graph.facebook.com/v19.0/me?fields=id,name,email,picture.type(large)&access_token=${encodeURIComponent(accessToken)}`;
+    const response = await fetch(url);
+    const data = (await response.json()) as {
+      id?: string;
+      name?: string;
+      email?: string;
+      picture?: { data?: { url?: string } };
+      error?: { message?: string; code?: number };
+    };
+
+    if (data.error || !data.id) {
+      return { error: "invalid_facebook_token", status: 401 };
+    }
+
+    return {
+      facebookId: data.id,
+      email: data.email ?? undefined,
+      name: data.name ?? undefined,
+      picture: data.picture?.data?.url ?? undefined,
+    };
+  } catch {
+    return { error: "invalid_facebook_token", status: 401 };
+  }
+}
+
 export function createAuthRoutes(repos: Repositories) {
   const r = new Hono<AppEnv>();
   const smsAdapter = createSmsAdapter();
@@ -155,7 +207,7 @@ export function createAuthRoutes(repos: Repositories) {
       throw new AppError(ErrorCode.VALIDATION, 400, {
         details: parsed.error.flatten(),
       });
-    const { name, phone, email, password, photo, googleId } = parsed.data;
+    const { name, phone, email, password, photo, googleId, facebookId } = parsed.data;
 
     const existsByPhone = await repos.users.findByPhone(phone);
     if (existsByPhone) throw new AppError(ErrorCode.PHONE_ALREADY_USED, 409);
@@ -168,7 +220,7 @@ export function createAuthRoutes(repos: Repositories) {
     const userData: Omit<
       Parameters<typeof repos.users.create>[0],
       "_id" | "createdAt" | "updatedAt"
-    > & { email?: string; googleId?: string } = {
+    > & { email?: string; googleId?: string; facebookId?: string } = {
       name,
       phone,
       photo: photo ?? null,
@@ -182,6 +234,9 @@ export function createAuthRoutes(repos: Repositories) {
     }
     if (googleId) {
       userData.googleId = googleId;
+    }
+    if (facebookId) {
+      userData.facebookId = facebookId;
     }
     const user = await repos.users.create(userData);
 
@@ -458,6 +513,100 @@ export function createAuthRoutes(repos: Repositories) {
       if (error instanceof AppError) throw error;
       console.error("Google register info error:", error);
       throw new AppError(ErrorCode.GOOGLE_AUTH_FAILED, 500);
+    }
+  });
+
+  r.post("/facebook-login", async (c) => {
+    const body = await c.req.json().catch(() => null);
+    const parsed = facebookLoginSchema.safeParse(body);
+    if (!parsed.success)
+      throw new AppError(ErrorCode.VALIDATION, 400, {
+        details: parsed.error.flatten(),
+      });
+    const { accessToken } = parsed.data;
+
+    const facebookAppId = process.env.FACEBOOK_APP_ID;
+    if (!facebookAppId) {
+      console.error("Facebook App ID not configured. Set FACEBOOK_APP_ID environment variable");
+      throw new AppError(ErrorCode.FACEBOOK_AUTH_NOT_CONFIGURED, 500);
+    }
+
+    try {
+      const fbInfo = await verifyFacebookAccessToken(accessToken);
+      if ("error" in fbInfo) {
+        throw new AppError(fbInfo.error as ErrorCodeValue, fbInfo.status);
+      }
+
+      const { facebookId, email } = fbInfo;
+
+      // Find user by facebookId
+      let user = await repos.users.findByFacebookId(facebookId);
+
+      // If not found by facebookId, try to find by email and auto-link
+      if (!user && email) {
+        const existingUser = await repos.users.findByEmail(email);
+        if (existingUser) {
+          user = await repos.users.update(existingUser._id, { facebookId });
+        }
+      }
+
+      if (!user) {
+        throw new AppError(ErrorCode.FACEBOOK_ACCOUNT_NOT_FOUND, 403);
+      }
+
+      if (user.blocked) throw new AppError(ErrorCode.USER_BLOCKED, 403);
+
+      // If 2FA is enabled, return a TOTP challenge instead of a token
+      if (user.twoFactorEnabled && user.totpSecret) {
+        const challengeToken = signTotpChallenge(user._id);
+        return c.json({ requiresTotp: true, challengeToken });
+      }
+
+      const token = signToken({ sub: user._id, tv: user.tokenVersion || 0 });
+      setAuthCookie(c, token);
+      return c.json({ user: sanitizeUser(user) });
+    } catch (error) {
+      if (error instanceof AppError) throw error;
+      console.error("Facebook login error:", error);
+      throw new AppError(ErrorCode.FACEBOOK_AUTH_FAILED, 500);
+    }
+  });
+
+  r.post("/facebook-register-info", async (c) => {
+    const body = await c.req.json().catch(() => null);
+    const parsed = facebookLoginSchema.safeParse(body);
+    if (!parsed.success)
+      throw new AppError(ErrorCode.VALIDATION, 400, {
+        details: parsed.error.flatten(),
+      });
+    const { accessToken } = parsed.data;
+
+    const facebookAppId = process.env.FACEBOOK_APP_ID;
+    if (!facebookAppId) {
+      console.error("Facebook App ID not configured. Set FACEBOOK_APP_ID environment variable");
+      throw new AppError(ErrorCode.FACEBOOK_AUTH_NOT_CONFIGURED, 500);
+    }
+
+    try {
+      const fbInfo = await verifyFacebookAccessToken(accessToken);
+      if ("error" in fbInfo) {
+        throw new AppError(fbInfo.error as ErrorCodeValue, fbInfo.status);
+      }
+
+      const { facebookId, email, name, picture } = fbInfo;
+
+      if (email) {
+        const existingByEmail = await repos.users.findByEmail(email);
+        if (existingByEmail) {
+          throw new AppError(ErrorCode.EMAIL_ALREADY_USED, 409);
+        }
+      }
+
+      return c.json({ facebookId, email, name, picture });
+    } catch (error) {
+      if (error instanceof AppError) throw error;
+      console.error("Facebook register info error:", error);
+      throw new AppError(ErrorCode.FACEBOOK_AUTH_FAILED, 500);
     }
   });
 

@@ -3,12 +3,6 @@
 
 export type Id = string;
 
-export interface GoogleCalendarTokens {
-  accessToken: string;
-  refreshToken: string;
-  expiryDate: number;
-}
-
 export interface User {
   _id: Id;
   name: string;
@@ -17,10 +11,10 @@ export interface User {
   phone: string;
   passwordHash: string;
   googleId?: string | null;
+  facebookId?: string | null;
   blocked: boolean;
   permissions?: string[];
   verified?: boolean;
-  googleCalendarTokens?: GoogleCalendarTokens | null;
   createdAt: Date;
   updatedAt: Date;
   // Account lockout fields
@@ -87,6 +81,7 @@ export interface Repositories {
     findByPhone(phone: string): Promise<User | null>;
     findByEmail(email: string): Promise<User | null>;
     findByGoogleId(googleId: string): Promise<User | null>;
+    findByFacebookId(facebookId: string): Promise<User | null>;
     findAll(): Promise<User[]>;
     findPaginated(page: number, limit: number): Promise<User[]>;
     count(): Promise<number>;

@@ -4,13 +4,14 @@ import { StatusBar, Style } from "@capacitor/status-bar";
 import { NavigationBar } from "@capgo/capacitor-navigation-bar";
 import App from "./App";
 import "@components/index.css";
+import "@utils/i18n";
 import { BaseUrlProvider } from "@/contexts/BaseUrlContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { NativeThemeProvider } from "@/components/NativeThemeProvider";
 import { api } from "@utils/client";
 
-const APP_BAR_COLOR = "#0077ff";
-const DARK_APP_BAR_COLOR = "#0f172a";
+const APP_BAR_COLOR = "#ef4444";
+const DARK_APP_BAR_COLOR = "#111111";
 
 async function setupNativeBars(theme: "light" | "dark" = "light") {
   if (!Capacitor.isNativePlatform()) return;

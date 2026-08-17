@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import type { Repositories, Id, Notification } from "../types";
 import { requireAuth, type AppEnv } from "../middleware/auth";
 import { wsServer } from "../websocket";
-import { sendPushNotification } from "../utils/web-push";
+import { enqueueJob } from "../queue";
 import { AppError } from "../utils/AppError";
 import { ErrorCode } from "../utils/errorCodes";
 
@@ -128,8 +128,13 @@ export function createNotificationsRoutes(repos: Repositories) {
         data: createdNotification,
       });
 
-      // Send push notification for offline users
-      await sendPushNotification(repos, createdNotification.userId, createdNotification);
+      // Offload WebPush dispatch asynchronously to the job queue
+      enqueueJob("push:send", {
+        userId: createdNotification.userId,
+        notification: createdNotification,
+      }).catch((err) => {
+        console.warn("[notifications] Failed to enqueue push job:", err);
+      });
 
       return c.json(createdNotification);
     } catch (error) {

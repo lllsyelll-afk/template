@@ -19,5 +19,32 @@ export function createCliRoutes(_repos: Repositories) {
 
   r.use("*", requireCliApiKey());
 
+  // Queue diagnostics and management
+  r.get("/queue/stats", async (c) => {
+    const { getQueue } = await import("../../queue");
+    const stats = await getQueue().getStats();
+    return c.json(stats);
+  });
+
+  r.get("/queue/jobs", async (c) => {
+    const { getQueue } = await import("../../queue");
+    const status = c.req.query("status") as any;
+    const limit = Number(c.req.query("limit") || 50);
+    const jobs = await getQueue().getJobs(status, limit);
+    return c.json({ jobs });
+  });
+
+  r.post("/queue/retry-failed", async (c) => {
+    const { getQueue } = await import("../../queue");
+    const count = await getQueue().retryFailed();
+    return c.json({ retried: count });
+  });
+
+  r.post("/queue/clear-completed", async (c) => {
+    const { getQueue } = await import("../../queue");
+    const count = await getQueue().clearCompleted();
+    return c.json({ cleared: count });
+  });
+
   return r;
 }

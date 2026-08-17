@@ -35,7 +35,7 @@
     "vite-plugin-electron": "^0.29.1",
     "vite-plugin-electron-renderer": "^0.14.6",
     "zod": "^3.24.2",
-    "app-types": "github:khofkhof.dz/khofkhoftypes"
+    "app-types": "file:../project-types"
   },
   "devDependencies": {
     "@capacitor/cli": "^8.0.0",

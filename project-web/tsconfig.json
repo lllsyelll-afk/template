@@ -4,7 +4,11 @@
     "alwaysStrict": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
-    "lib": ["es2022", "dom", "dom.iterable"],
+    "lib": [
+      "es2022",
+      "dom",
+      "dom.iterable"
+    ],
     "module": "esnext",
     "moduleResolution": "bundler",
     "noEmit": true,
@@ -14,10 +18,18 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "paths": {
-      "@/*": ["./src/*"],
-      "@admin/*": ["./admin/*"],
-      "@components/*": ["./components/*"],
-      "@utils/*": ["./utils/*"]
+      "@/*": [
+        "./src/*"
+      ],
+      "@admin/*": [
+        "./admin/*"
+      ],
+      "@components/*": [
+        "./components/*"
+      ],
+      "@utils/*": [
+        "./utils/*"
+      ]
     },
     "resolveJsonModule": true,
     "skipLibCheck": true,
@@ -26,10 +38,22 @@
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
     "target": "es2022",
-    "types": ["node", "vite/client", "google.maps"]
+    "types": [
+      "node",
+      "vite/client",
+      "google.maps"
+    ]
   },
-  "exclude": ["build", "dist-admin", "dist-web", "dist", "node_modules"],
-  "files": ["./tsconfig.node.json"],
+  "exclude": [
+    "build",
+    "dist-admin",
+    "dist-web",
+    "dist",
+    "node_modules"
+  ],
+  "files": [
+    "./tsconfig.node.json"
+  ],
   "include": [
     "src/**/*",
     "components/**/*",

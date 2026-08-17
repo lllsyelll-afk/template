@@ -28,6 +28,7 @@ import { wsServer } from "./websocket";
 import { createSmsAdapter } from "./sms";
 import { createEmailAdapter } from "./email";
 import { getDefaultStorage } from "./storage";
+import { initQueue, getQueue } from "./queue";
 
 const PORT = Number(process.env.API_PORT || 45231);
 const isDev = process.env.ENV === "development";
@@ -90,7 +91,7 @@ function getClientIP(c: KeyGenerator): string {
 }
 async function displayConfiguration() {
   console.log("\n" + "=".repeat(40));
-  console.log("🚀 IHAJAZ API PROVIDERS");
+  console.log("🚀 TEMPLATE API PROVIDERS");
   console.log("=".repeat(40));
 
   // Database Configuration
@@ -115,6 +116,12 @@ async function displayConfiguration() {
   const emailProvider = process.env.EMAIL_PROVIDER || "local";
   console.log(`📧 Email: ${emailProvider} ${emailStatus ? "✅" : "❌"}`);
 
+  // Async Job Queue Configuration with connection check
+  const queueAdapter = getQueue();
+  const queueStatus = await queueAdapter.check();
+  const queueProvider = process.env.QUEUE_PROVIDER || "mongo";
+  console.log(`📬 Queue: ${queueProvider} ${queueStatus ? "✅" : "❌"}`);
+
   // Other services (no connection check available)
   console.log(`💳 Payment: Chargily`);
 
@@ -124,7 +131,8 @@ async function displayConfiguration() {
 
 async function main() {
   await displayConfiguration();
-  const { repos } = await initRepositories();
+  const { repos, close: closeDb } = await initRepositories();
+  const { worker } = await initQueue(repos);
   const app = new Hono<AppEnv>();
 
   const ALLOWED_ORIGIN = process.env.CORS_ORIGIN || "";
@@ -265,8 +273,10 @@ async function main() {
   console.log(`[ws] WebSocket server ready at ws://localhost:${PORT}/api/ws`);
 
   // Graceful shutdown for nodemon restarts
-  const shutdown = () => {
+  const shutdown = async () => {
     console.log("[api] shutting down...");
+    await worker.stop();
+    await closeDb();
     server.close(() => {
       process.exit(0);
     });

@@ -3,13 +3,6 @@ import { z } from "zod";
 export const IdSchema = z.string();
 export type Id = z.infer<typeof IdSchema>;
 
-export const GoogleCalendarTokensSchema = z.object({
-  accessToken: z.string(),
-  refreshToken: z.string(),
-  expiryDate: z.number(),
-});
-export type GoogleCalendarTokens = z.infer<typeof GoogleCalendarTokensSchema>;
-
 export const UserSchema = z.object({
   _id: IdSchema,
   name: z.string(),
@@ -18,10 +11,10 @@ export const UserSchema = z.object({
   phone: z.string(),
   passwordHash: z.string().optional(),
   googleId: z.string().nullable().optional(),
+  facebookId: z.string().nullable().optional(),
   blocked: z.boolean(),
   permissions: z.array(z.string()).optional(),
   verified: z.boolean().optional(),
-  googleCalendarTokens: GoogleCalendarTokensSchema.nullable().optional(),
   createdAt: z.string(),
   updatedAt: z.string(),
   failedLoginAttempts: z.number().optional(),

@@ -16,8 +16,8 @@ function RequireGuest({ children }: Props) {
       // Check for redirect param using useSearch hook
       const params = new URLSearchParams(search || "");
       const redirectTo = params.get("redirect");
-      // Redirect to specified URL or default to /map
-      navigate(redirectTo || "/map");
+      // Redirect to specified URL or default to /
+      navigate(redirectTo || "/");
     }
   }, [isAuthenticated, search, navigate]);
 

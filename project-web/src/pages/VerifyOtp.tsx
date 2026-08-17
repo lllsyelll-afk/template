@@ -36,7 +36,7 @@ export default function VerifyOtpPage() {
         code: values.code,
         purpose: "register",
       });
-      navigate("/map");
+      navigate("/");
     } catch (error) {
       console.error("OTP verification failed:", error);
     }

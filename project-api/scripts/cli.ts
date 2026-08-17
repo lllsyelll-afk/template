@@ -6,6 +6,7 @@ import {
   question,
 } from "./utils";
 import { createAdmin, updatePermissions } from "./commands/admin";
+import { manageQueue } from "./commands/queue";
 
 // =====================
 // MAIN MENU
@@ -19,6 +20,7 @@ const showMenu = async (): Promise<void> => {
   const commands = [
     "🔑 Create Admin User",
     "🔐 Update User Permissions",
+    "📬 Async Job Queue Manager",
     "❌ Exit",
   ];
 
@@ -30,6 +32,9 @@ const showMenu = async (): Promise<void> => {
       break;
     case "🔐 Update User Permissions":
       await updatePermissions();
+      break;
+    case "📬 Async Job Queue Manager":
+      await manageQueue();
       break;
     case "❌ Exit":
       console.log("\n� Goodbye!");

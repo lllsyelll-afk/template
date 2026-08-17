@@ -24,8 +24,8 @@ async function initProject() {
     .filter(dirent => dirent.isDirectory())
     .map(dirent => dirent.name);
 
-  const apiDir = dirs.find(d => d.endsWith('-api')) || 'khofkhof-api';
-  const webDir = dirs.find(d => d.endsWith('-web')) || 'khofkhof-web';
+  const apiDir = dirs.find(d => d.endsWith('-api')) || 'template-api';
+  const webDir = dirs.find(d => d.endsWith('-web')) || 'template-web';
   const typesDir = dirs.find(d => d.endsWith('-types')); // might be undefined
 
   // --- PROJECT NAME ---
@@ -138,13 +138,11 @@ async function initProject() {
   }
 
   // --- SECURITY & INTEGRATIONS ---
-  if (await askYesNo("\n🛡️ Do you want to configure API Security & Integrations (Turnstile, Google Calendar, VAPID)?")) {
+  if (await askYesNo("\n🛡️ Do you want to configure API Security & Integrations (Turnstile, Google Sign-In, VAPID)?")) {
     replacements.api['TURNSTILE_SECRET_KEY'] = await askQuestion("🤖 TURNSTILE_SECRET_KEY: ");
     replacements.web['VITE_TURNSTILE_SITE_KEY'] = await askQuestion("🤖 VITE_TURNSTILE_SITE_KEY: ");
 
-    replacements.api['GOOGLE_CLIENT_ID'] = await askQuestion("📅 GOOGLE_CLIENT_ID: ");
-    replacements.api['GOOGLE_CLIENT_SECRET'] = await askQuestion("📅 GOOGLE_CLIENT_SECRET: ");
-    replacements.api['GOOGLE_REDIRECT_URI'] = await askQuestion("↪️ GOOGLE_REDIRECT_URI: ");
+    replacements.api['GOOGLE_CLIENT_ID'] = await askQuestion("🔑 GOOGLE_CLIENT_ID: ");
     replacements.web['VITE_GOOGLE_CLIENT_ID'] = replacements.api['GOOGLE_CLIENT_ID']; // reuse
 
     replacements.api['VAPID_PUBLIC_KEY'] = await askQuestion("🔔 VAPID_PUBLIC_KEY: ");

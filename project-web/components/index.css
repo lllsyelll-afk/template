@@ -1,13 +1,14 @@
 @import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,850;1,850&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
+
 :root {
   --app-font: "Nunito", sans-serif;
   --app-font-serif: Georgia, serif;
   --app-font-mono: Menlo, monospace;
   --background: hsl(0, 0%, 100%);
   --foreground: hsl(220, 10%, 15%);
-  --primary: hsl(212, 100%, 50%);
+  --primary: hsl(0, 84%, 55%);
   --secondary: hsl(220, 15%, 10%);
   --success: hsl(220, 15%, 10%);
   --error: hsl(0, 84%, 52%);
@@ -29,22 +30,22 @@
   --color-white: hsl(0, 0%, 100%);
   --color-muted-border: hsl(220, 10%, 85%);
   --sidebar-border: hsl(220, 10%, 85%);
-  --sidebar-primary-border: hsl(212, 100%, 42%);
+  --sidebar-primary-border: hsl(0, 84%, 45%);
 }
 
 .dark {
   --app-font: "Nunito", sans-serif;
   --app-font-serif: Georgia, serif;
   --app-font-mono: Menlo, monospace;
-  --background: hsl(220, 15%, 10%);
+  --background: #111111;
   --foreground: hsl(0, 0%, 95%);
-  --primary: hsl(212, 100%, 55%);
-  --secondary: hsl(220, 15%, 10%);
-  --success: hsl(220, 15%, 10%);
+  --primary: hsl(0, 84%, 60%);
+  --secondary: hsl(0, 0%, 18%);
+  --success: hsl(0, 0%, 18%);
   --error: hsl(0, 84%, 52%);
   --warning: hsl(39, 100%, 50%);
-  --muted: hsl(220, 15%, 22%);
-  --muted-foreground: hsl(220, 10%, 60%);
+  --muted: hsl(0, 0%, 16%);
+  --muted-foreground: hsl(0, 0%, 65%);
   --primary-foreground: hsl(0, 0%, 100%);
   --radius: 0.5rem;
 
@@ -54,14 +55,15 @@
   --font-size-xl: 24px;
   --font-size-2xl: 30px;
   --font-size-3xl: 36px;
-  --color-border: hsl(220, 15%, 25%);
-  --color-input: hsl(220, 15%, 18%);
-  --color-popover: hsl(220, 15%, 12%);
+  --color-border: hsl(0, 0%, 20%);
+  --color-input: hsl(0, 0%, 15%);
+  --color-popover: hsl(0, 0%, 10%);
   --color-white: hsl(0, 0%, 100%);
-  --color-muted-border: hsl(220, 15%, 25%);
-  --sidebar-border: hsl(220, 15%, 20%);
-  --sidebar-primary-border: hsl(220, 15%, 30%);
+  --color-muted-border: hsl(0, 0%, 20%);
+  --sidebar-border: hsl(0, 0%, 18%);
+  --sidebar-primary-border: hsl(0, 84%, 48%);
 }
+
 @theme {
   --font-size-base: var(--font-size-base);
   --font-size-lg: var(--font-size-lg);
@@ -113,9 +115,11 @@
   --border-radius-lg: var(--radius);
   --border-radius-xl: calc(var(--radius) + 4px);
 }
+
 html {
   font-size: var(--font-size-base);
 }
+
 body {
   font-family: var(--app-font);
   font-optical-sizing: auto;
@@ -123,34 +127,43 @@ body {
   font-style: normal;
   @apply bg-background text-foreground;
 }
+
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
   background: hsl(220, 10%, 75%);
   border-radius: 3px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(220, 10%, 65%);
 }
+
 .dark ::-webkit-scrollbar-thumb {
   background: hsl(220, 15%, 35%);
 }
+
 .dark ::-webkit-scrollbar-thumb:hover {
   background: hsl(220, 15%, 45%);
 }
+
 .leaflet-control-zoom,
 .leaflet-control-attribution {
   display: none !important;
 }
+
 [data-radix-popper-content-wrapper] {
   position: fixed !important;
   z-index: 9999 !important;
 }
+
 [data-radix-portal] {
   position: fixed !important;
   top: 0 !important;
@@ -159,16 +172,18 @@ body {
   bottom: 0 !important;
   pointer-events: none !important;
 }
-[data-radix-portal] > * {
+
+[data-radix-portal]>* {
   pointer-events: auto !important;
 }
+
 body[data-radix-dropdown-menu-open] {
   overflow: hidden !important;
 }
 
 /* Primary button 3D press effect */
 .btn-primary {
-  @apply relative box-border overflow-visible text-center uppercase align-middle outline-none select-none touch-manipulation;
+  @apply box-border relative outline-none overflow-visible text-center uppercase align-middle touch-manipulation select-none;
   appearance: button;
   border: solid transparent;
   border-radius: 16px;
@@ -181,7 +196,7 @@ body[data-radix-dropdown-menu-open] {
 }
 
 .btn-primary::after {
-  @apply absolute inset-0 rounded-2xl border-solid border-transparent;
+  @apply absolute inset-0 border-transparent border-solid rounded-2xl;
   background-clip: padding-box;
   background-color: color-mix(in srgb, var(--primary) 70%, transparent);
   border-width: 0 0 4px;
@@ -199,7 +214,7 @@ body[data-radix-dropdown-menu-open] {
 }
 
 .btn-primary:active {
-  @apply pb-[10px];
+  @apply pb-2.5;
 }
 
 /* MUI-style ripple animation */
@@ -208,11 +223,13 @@ body[data-radix-dropdown-menu-open] {
     transform: scale(0);
     opacity: 0.5;
   }
+
   100% {
     transform: scale(1);
     opacity: 0;
   }
 }
+
 .animate-ripple {
   animation: ripple 600ms ease-out forwards;
 }

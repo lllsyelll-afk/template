@@ -10,6 +10,8 @@ import {
   useAuth,
   useGoogleLogin,
   useGoogleRegisterInfo,
+  useFacebookLogin,
+  useFacebookRegisterInfo,
   useLoginVerifyTotp,
 } from "@/hooks/auth";
 import { api } from "@utils/client";
@@ -21,6 +23,8 @@ import { PhoneStep } from "./auth/PhoneStep";
 import { OtpStep } from "./auth/OtpStep";
 import { useBaseUrlPopup } from "@/contexts/BaseUrlContext";
 import { LanguageSwitcher } from "@components/LanguageSwitcher";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { FacebookAuthButton } from "@/components/FacebookAuthButton";
 import { ForgotPasswordDialog } from "@/components/ForgotPasswordDialog";
 import { Eye, EyeOff } from "lucide-react";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@components/ui/input-otp";
@@ -28,10 +32,11 @@ import { GoogleOAuthProvider, GoogleLogin, type CredentialResponse } from "@reac
 import { useLanguage } from "@components/LanguageContext";
 
 function DevConfigButton({ openBaseUrlPopup }: { openBaseUrlPopup: () => void }) {
+  const { t } = useTranslation();
   if (!import.meta.env.DEV) return null;
   return (
     <Button onClick={openBaseUrlPopup} className="mt-4">
-      Configure API URL
+      {t("api_base_url_title", { defaultValue: "Configure API URL" })}
     </Button>
   );
 }
@@ -101,6 +106,8 @@ export default function AuthPage({ mode }: AuthPageProps) {
   const login = useLogin();
   const googleLogin = useGoogleLogin();
   const googleRegisterInfo = useGoogleRegisterInfo();
+  const facebookLogin = useFacebookLogin();
+  const facebookRegisterInfo = useFacebookRegisterInfo();
   const register = useRegister();
   const [registerStep, setRegisterStep] = useState(0);
   const [registerData, setRegisterData] = useState<RegisterData>({
@@ -111,6 +118,12 @@ export default function AuthPage({ mode }: AuthPageProps) {
   const [googleRegisterData, setGoogleRegisterData] = useState<{
     googleId: string;
     email: string;
+    name?: string;
+    picture?: string;
+  } | null>(null);
+  const [facebookRegisterData, setFacebookRegisterData] = useState<{
+    facebookId: string;
+    email?: string;
     name?: string;
     picture?: string;
   } | null>(null);
@@ -165,10 +178,10 @@ export default function AuthPage({ mode }: AuthPageProps) {
 
   const isLoading = login.isPending || status === "loading";
 
-  // Redirect authenticated users to redirect param or /map
+  // Redirect authenticated users to redirect param or /
   useEffect(() => {
     if (isAuthenticated) {
-      navigate(redirectTo || "/map");
+      navigate(redirectTo || "/");
     }
   }, [isAuthenticated, navigate, redirectTo]);
 
@@ -207,6 +220,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
         email: updatedData.email,
         photo: updatedData.photo,
         googleId: googleRegisterData?.googleId,
+        facebookId: facebookRegisterData?.facebookId,
       });
       const otp = result.otp?.code;
       if (otp) setDevOtpCode(otp);
@@ -296,13 +310,55 @@ export default function AuthPage({ mode }: AuthPageProps) {
     });
   };
 
+  const handleFacebookSuccess = async (accessToken: string) => {
+    if (mode === "login") {
+      try {
+        const result = await facebookLogin.mutateAsync(accessToken);
+        if (result && "requiresTotp" in result && result.requiresTotp) {
+          setTotpChallengeToken(result.challengeToken);
+        }
+        // Navigation handled by useEffect with redirectTo
+      } catch {
+        // Handled by mutation
+      }
+    } else {
+      // Register mode
+      try {
+        const info = await facebookRegisterInfo.mutateAsync(accessToken);
+        setFacebookRegisterData(info);
+        setRegisterData((prev) => ({
+          ...prev,
+          name: info.name ?? prev.name,
+          email: info.email ?? prev.email,
+        }));
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : "facebook_register_failed";
+        if (errorMessage === "email_already_used") {
+          toast({
+            title: t("auth_error"),
+            description: t("auth_facebook_email_used", {
+              defaultValue: "This Facebook email is already registered. Please log in.",
+            }),
+          });
+        }
+      }
+    }
+  };
+
+  const handleFacebookError = () => {
+    toast({
+      title: t("auth_error"),
+      description: t("auth_facebook_error", {
+        defaultValue: "Failed to authenticate with Facebook. Please try again.",
+      }),
+    });
+  };
+
   if (mode === "register") {
     const stepContent = {
       0: (
         <>
-          <div className="top-4 right-4 z-50 absolute flex gap-2">
-            <LanguageSwitcher />
-          </div>
           <h1 className="mb-1 font-bold text-2xl">{t("auth_register")}</h1>
           <p className="mb-6 text-muted-foreground text-sm">
             {t("auth_create_account_desc", { defaultValue: "Create your account to get started" })}
@@ -310,23 +366,34 @@ export default function AuthPage({ mode }: AuthPageProps) {
           <div className="flex flex-col gap-4 w-full max-w-md">
             <NameStep
               onSubmit={handleNameSubmit}
-              defaultName={googleRegisterData?.name}
+              defaultName={googleRegisterData?.name || facebookRegisterData?.name}
             />
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">
-                  {t("auth_or")}
-                </span>
-              </div>
-            </div>
-            <GoogleAuthButton
-              mode="register"
-              onSuccess={handleGoogleSuccess}
-              onError={handleGoogleError}
-            />
+            {(import.meta.env.VITE_GOOGLE_CLIENT_ID || import.meta.env.VITE_FACEBOOK_APP_ID) && (
+              <>
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-background px-2 text-muted-foreground">
+                      {t("auth_or")}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex justify-center items-center gap-3">
+                  <GoogleAuthButton
+                    mode="register"
+                    onSuccess={handleGoogleSuccess}
+                    onError={handleGoogleError}
+                  />
+                  <FacebookAuthButton
+                    mode="register"
+                    onSuccess={handleFacebookSuccess}
+                    onError={handleFacebookError}
+                  />
+                </div>
+              </>
+            )}
           </div>
         </>
       ),
@@ -358,6 +425,10 @@ export default function AuthPage({ mode }: AuthPageProps) {
 
     return (
       <div className="absolute inset-0 flex flex-col justify-center items-center px-6">
+        <div className="top-4 right-4 z-50 absolute flex items-center gap-2">
+          <LanguageSwitcher />
+          <ThemeToggle variant="icon" />
+        </div>
         {stepContent[registerStep as keyof typeof stepContent]}
         <DevConfigButton openBaseUrlPopup={openBaseUrlPopup} />
       </div>
@@ -366,8 +437,9 @@ export default function AuthPage({ mode }: AuthPageProps) {
   return (
     <>
       <div className="absolute inset-0 flex flex-col justify-center items-center px-6">
-        <div className="top-4 right-4 z-50 absolute flex gap-2">
+        <div className="top-4 right-4 z-50 absolute flex items-center gap-2">
           <LanguageSwitcher />
+          <ThemeToggle variant="icon" />
         </div>
         {totpChallengeToken ? (
           <div className="flex flex-col gap-4 w-full max-w-md items-center">
@@ -459,33 +531,38 @@ export default function AuthPage({ mode }: AuthPageProps) {
                 </Button>
               </form>
 
-              {/* Google Sign-In */}
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-background px-2 text-muted-foreground">
-                    {t("auth_or_continue_with", { defaultValue: "Or continue with" })}
-                  </span>
-                </div>
-              </div>
-              <GoogleAuthButton
-                mode="login"
-                onSuccess={handleGoogleSuccess}
-                onError={handleGoogleError}
-              />
+              {/* Social Logins */}
+              {(import.meta.env.VITE_GOOGLE_CLIENT_ID || import.meta.env.VITE_FACEBOOK_APP_ID) && (
+                <>
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-background px-2 text-muted-foreground">
+                        {t("auth_or_continue_with", { defaultValue: "Or continue with" })}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex justify-center items-center gap-3">
+                    <GoogleAuthButton
+                      mode="login"
+                      onSuccess={handleGoogleSuccess}
+                      onError={handleGoogleError}
+                    />
+                    <FacebookAuthButton
+                      mode="login"
+                      onSuccess={handleFacebookSuccess}
+                      onError={handleFacebookError}
+                    />
+                  </div>
+                </>
+              )}
 
               <p className="text-muted-foreground text-sm text-center">
                 {t("auth_no_account")}
                 <Link href="/register" className="mx-2 font-semibold underline">
                   {t("auth_register")}
-                </Link>
-              </p>
-              <p className="text-muted-foreground text-sm text-center">
-                {t("auth_go_to", { defaultValue: "go to" })}{" "}
-                <Link href="/map" className="font-semibold underline">
-                  {t("auth_map", { defaultValue: "map" })}
                 </Link>
               </p>
             </div>

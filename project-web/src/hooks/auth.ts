@@ -179,6 +179,53 @@ export function useGoogleRegisterInfo() {
   });
 }
 
+export function useFacebookLogin() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (accessToken: string) => {
+      updateState({ status: "loading", error: null });
+      const result = await api.post<{ user: User } | { requiresTotp: true; challengeToken: string }>(
+        "/auth/facebook-login",
+        { accessToken },
+      );
+      return result;
+    },
+    onSuccess: (data) => {
+      if ("requiresTotp" in data) {
+        updateState({ status: "idle", error: null });
+        return;
+      }
+      updateState({
+        user: data.user,
+        status: "idle",
+        error: null,
+      });
+      queryClient.invalidateQueries({ queryKey: authKeys.all });
+    },
+    onError: (error) => {
+      updateState({
+        status: "error",
+        error: error instanceof Error ? error.message : "facebook_login_failed",
+      });
+    },
+  });
+}
+
+export function useFacebookRegisterInfo() {
+  return useMutation({
+    mutationFn: async (accessToken: string) => {
+      const result = await api.post<{
+        facebookId: string;
+        email?: string;
+        name?: string;
+        picture?: string;
+      }>("/auth/facebook-register-info", { accessToken });
+      return result;
+    },
+  });
+}
+
 export function useRegister() {
   const queryClient = useQueryClient();
 
@@ -190,6 +237,7 @@ export function useRegister() {
       password: string;
       photo?: string;
       googleId?: string;
+      facebookId?: string;
     }) => {
       // NOTE: Do NOT flip the global auth status to "loading" here.
       // Registration does not authenticate the user (OTP is still pending),

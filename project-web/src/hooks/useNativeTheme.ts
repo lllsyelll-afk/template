@@ -4,8 +4,8 @@ import { StatusBar, Style } from "@capacitor/status-bar";
 import { NavigationBar } from "@capgo/capacitor-navigation-bar";
 import { useTheme } from "@/contexts/ThemeContext";
 
-const APP_BAR_COLOR = "#0077ff";
-const DARK_APP_BAR_COLOR = "#0f172a";
+const APP_BAR_COLOR = "#ef4444";
+const DARK_APP_BAR_COLOR = "#111111";
 
 export function useNativeTheme() {
   const { resolvedTheme } = useTheme();
